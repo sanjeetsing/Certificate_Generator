@@ -1,0 +1,945 @@
+```html
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>NIAT Certificate Generator</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
+
+@font-face {
+    font-family: "Casanova Scotia";
+    src: url("Casanova Scotia.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f5fa;
+    color: #172033;
+}
+
+header {
+    background: #0a1020;
+    color: white;
+    padding: 16px 24px;
+}
+
+main {
+    max-width: 1450px;
+    margin: auto;
+    padding: 22px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 22px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 22px #17203318;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+h3 {
+    font-size: 14px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 12px 0 6px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d7dce8;
+    border-radius: 8px;
+}
+
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #3159d8;
+    color: white;
+}
+
+.alt {
+    background: #e9edfa;
+    color: #24366c;
+}
+
+.green {
+    background: #16865c;
+}
+
+.gray {
+    background: #697386;
+}
+
+.full {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.g2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.g3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.box {
+    padding: 12px;
+    background: #f7f9fe;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.status {
+    padding: 10px;
+    background: #f3f6ff;
+    border-radius: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.help {
+    font-size: 12px;
+    color: #667085;
+    line-height: 1.5;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+}
+
+canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: black;
+}
+
+.val {
+    text-align: center;
+    font-size: 11px;
+    color: #667085;
+    margin-top: 6px;
+}
+
+button:disabled {
+    opacity: 0.45;
+}
+
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr;
+        padding: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <b>NIAT Certificate Generator</b>
+</header>
+
+<main>
+
+<section class="card">
+
+    <h2>Generate Certificates</h2>
+
+    <p class="help">
+        Upload CSV with a <b>Name</b> column.
+        An optional <b>Issue Date</b> or <b>Date</b> column is supported.
+    </p>
+
+    <label>Upload CSV</label>
+    <input id="csv" type="file" accept=".csv">
+
+    <label>Common Issue Date</label>
+    <input id="issueDate" type="date">
+    <button id="applyDate" class="full alt">Apply Date</button>
+
+    <label>Test / Edit Current Name</label>
+    <input id="testName" placeholder="e.g. Aman Sharma">
+    <button id="previewName" class="full">Preview Name</button>
+
+    <div class="box">
+        <h3>Adjust Name Position</h3>
+
+        <div class="g3">
+            <span></span>
+            <button class="alt" id="nu">↑ Up</button>
+            <span></span>
+        </div>
+
+        <div class="g2">
+            <button class="alt" id="nl">← Left</button>
+            <button class="alt" id="nr">Right →</button>
+        </div>
+
+        <div class="g3">
+            <span></span>
+            <button class="alt" id="nd">↓ Down</button>
+            <span></span>
+        </div>
+
+        <div class="g2">
+            <button class="alt" id="ns">A−</button>
+            <button class="alt" id="nb">A+</button>
+        </div>
+
+        <div id="np" class="val"></div>
+    </div>
+
+    <div class="box">
+        <h3>Adjust Issue Date Position</h3>
+
+        <div class="g3">
+            <span></span>
+            <button class="alt" id="du">↑ Up</button>
+            <span></span>
+        </div>
+
+        <div class="g2">
+            <button class="alt" id="dl">← Left</button>
+            <button class="alt" id="dr">Right →</button>
+        </div>
+
+        <div class="g3">
+            <span></span>
+            <button class="alt" id="dd">↓ Down</button>
+            <span></span>
+        </div>
+
+        <div class="g2">
+            <button class="alt" id="ds">A−</button>
+            <button class="alt" id="db">A+</button>
+        </div>
+
+        <div id="dp" class="val"></div>
+    </div>
+
+    <button id="reset" class="full gray">
+        Reset Positions
+    </button>
+
+    <div id="status" class="status">
+        Ready.
+    </div>
+
+    <div class="g2">
+        <button class="alt" id="prev" disabled>
+            ← Previous
+        </button>
+
+        <button class="alt" id="next" disabled>
+            Next →
+        </button>
+    </div>
+
+    <button id="downloadBtn" class="full">
+        Download Certificate PNG
+    </button>
+
+    <button id="all" class="full green" disabled>
+        Download All PNGs
+    </button>
+
+    <p class="help">
+        Example: Name,Issue Date<br>
+        Aman Sharma,12-09-2026<br>
+        Priya Singh,12-09-2026
+    </p>
+
+</section>
+
+<section class="card">
+
+    <div class="head">
+        <h2>Certificate Preview</h2>
+        <b id="count"></b>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+</section>
+
+</main>
+
+<script>
+
+const $ = x => document.getElementById(x);
+
+const c = $("canvas");
+const x = c.getContext("2d");
+const im = new Image();
+
+let rows = [];
+let i = 0;
+
+let n = "";
+let d = "";
+
+/*
+    NAME
+    Casanova Scotia - 46px
+*/
+let nx = 728;
+let ny = 575;
+let nz = 46;
+
+/*
+    DATE
+    Montserrat SemiBold - 32px
+*/
+let dx = 645;
+let dy = 915;
+let dz = 32;
+
+
+/* =========================
+   LOAD IMAGE + FONTS
+========================= */
+
+im.onload = async () => {
+
+    try {
+        await document.fonts.load('46px "Casanova Scotia"');
+        await document.fonts.load('600 32px Montserrat');
+    } catch (error) {
+        console.warn("Font loading warning:", error);
+    }
+
+    c.width = im.naturalWidth;
+    c.height = im.naturalHeight;
+
+    draw();
+};
+
+im.src = "certificate.png";
+
+
+/* =========================
+   DATE FORMAT
+========================= */
+
+function fd(v) {
+
+    let m = String(v || "").match(
+        /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+    return m
+        ? m[3] + "-" + m[2] + "-" + m[1]
+        : (v || "");
+}
+
+
+/* =========================
+   DRAW CERTIFICATE
+========================= */
+
+function draw() {
+
+    x.clearRect(0, 0, c.width, c.height);
+
+    x.drawImage(im, 0, 0);
+
+    x.fillStyle = "white";
+
+    x.textAlign = "center";
+    x.textBaseline = "middle";
+
+    x.shadowColor = "#000";
+    x.shadowBlur = 4;
+
+
+    /* =========================
+       STUDENT NAME
+       Casanova Scotia - 46px
+    ========================= */
+
+    if (n) {
+
+        let s = nz;
+
+        x.font = s + 'px "Casanova Scotia"';
+
+        /*
+            Automatically reduce size if
+            the name is too wide.
+            
+            IMPORTANT:
+            It remains Casanova Scotia.
+            It will NOT switch to Arial.
+        */
+
+        while (
+            x.measureText(n).width > 720 &&
+            s > 22
+        ) {
+
+            s--;
+
+            x.font = s + 'px "Casanova Scotia"';
+        }
+
+        x.fillText(n, nx, ny);
+    }
+
+
+    /* =========================
+       ISSUE DATE
+       Montserrat SemiBold - 32px
+    ========================= */
+
+    if (d) {
+
+        x.font = '600 ' + dz + 'px Montserrat, Arial, sans-serif';
+
+        x.fillText(
+            fd(d),
+            dx,
+            dy
+        );
+    }
+
+
+    x.shadowBlur = 0;
+
+
+    /* Position information */
+
+    $("np").textContent =
+        `X ${nx} | Y ${ny} | Size ${nz}`;
+
+    $("dp").textContent =
+        `X ${dx} | Y ${dy} | Size ${dz}`;
+}
+
+
+/* =========================
+   UPDATE PREVIEW
+========================= */
+
+function upd() {
+
+    if (rows.length) {
+
+        n = rows[i].name;
+
+        d =
+            rows[i].date ||
+            $("issueDate").value;
+
+        $("testName").value = n;
+
+        $("count").textContent =
+            (i + 1) + " / " + rows.length;
+
+        $("status").textContent =
+            "Previewing: " +
+            n +
+            (d ? " | " + fd(d) : "");
+    }
+
+    $("prev").disabled =
+        !rows.length || i === 0;
+
+    $("next").disabled =
+        !rows.length ||
+        i === rows.length - 1;
+
+    $("all").disabled =
+        !rows.length;
+
+    draw();
+}
+
+
+/* =========================
+   CSV PARSER
+========================= */
+
+function line(s) {
+
+    let a = [];
+    let q = false;
+    let t = "";
+
+    for (let j = 0; j < s.length; j++) {
+
+        let z = s[j];
+
+        if (z === '"') {
+
+            if (
+                q &&
+                s[j + 1] === '"'
+            ) {
+
+                t += '"';
+                j++;
+
+            } else {
+
+                q = !q;
+            }
+
+        } else if (
+            z === "," &&
+            !q
+        ) {
+
+            a.push(t.trim());
+            t = "";
+
+        } else {
+
+            t += z;
+        }
+    }
+
+    a.push(t.trim());
+
+    return a;
+}
+
+
+/* =========================
+   CSV UPLOAD
+========================= */
+
+$("csv").onchange = e => {
+
+    let f = e.target.files[0];
+
+    if (!f) return;
+
+    let r = new FileReader();
+
+    r.onload = () => {
+
+        let L =
+            String(r.result)
+                .split(/\r?\n/)
+                .filter(Boolean);
+
+        let h =
+            line(L[0])
+                .map(v =>
+                    v
+                        .replace(/^\uFEFF/, "")
+                        .toLowerCase()
+                );
+
+        let ni =
+            h.findIndex(v =>
+                [
+                    "name",
+                    "student name",
+                    "participant name"
+                ].includes(v)
+            );
+
+        let di =
+            h.findIndex(v =>
+                [
+                    "date",
+                    "issue date",
+                    "issuedate"
+                ].includes(v)
+            );
+
+        if (ni < 0) {
+
+            $("status").textContent =
+                "CSV must contain Name column.";
+
+            return;
+        }
+
+        rows =
+            L.slice(1)
+                .map(v => {
+
+                    let a = line(v);
+
+                    return {
+                        name:
+                            (a[ni] || "").trim(),
+
+                        date:
+                            di >= 0
+                                ? (a[di] || "").trim()
+                                : ""
+                    };
+
+                })
+                .filter(v => v.name);
+
+        i = 0;
+
+        upd();
+    };
+
+    r.readAsText(f);
+};
+
+
+/* =========================
+   PREVIEW / EDIT NAME
+========================= */
+
+$("previewName").onclick = () => {
+
+    let v =
+        $("testName")
+            .value
+            .trim();
+
+    if (!v) return;
+
+    if (rows.length) {
+
+        rows[i].name = v;
+
+    } else {
+
+        rows = [
+            {
+                name: v,
+                date: ""
+            }
+        ];
+    }
+
+    upd();
+};
+
+
+/* =========================
+   APPLY DATE
+========================= */
+
+$("applyDate").onclick = () => {
+
+    d =
+        rows.length
+            ? (
+                rows[i].date ||
+                $("issueDate").value
+            )
+            : $("issueDate").value;
+
+    draw();
+};
+
+
+/* =========================
+   MOVE TEXT
+========================= */
+
+function mv(k, a, b) {
+
+    if (k === "n") {
+
+        nx += a;
+        ny += b;
+
+    } else {
+
+        dx += a;
+        dy += b;
+    }
+
+    draw();
+}
+
+
+/* =========================
+   NAME POSITION BUTTONS
+========================= */
+
+$("nu").onclick =
+    () => mv("n", 0, -5);
+
+$("nd").onclick =
+    () => mv("n", 0, 5);
+
+$("nl").onclick =
+    () => mv("n", -5, 0);
+
+$("nr").onclick =
+    () => mv("n", 5, 0);
+
+
+/* =========================
+   DATE POSITION BUTTONS
+========================= */
+
+$("du").onclick =
+    () => mv("d", 0, -5);
+
+$("dd").onclick =
+    () => mv("d", 0, 5);
+
+$("dl").onclick =
+    () => mv("d", -5, 0);
+
+$("dr").onclick =
+    () => mv("d", 5, 0);
+
+
+/* =========================
+   NAME SIZE
+========================= */
+
+$("ns").onclick = () => {
+
+    nz = Math.max(
+        20,
+        nz - 2
+    );
+
+    draw();
+};
+
+$("nb").onclick = () => {
+
+    nz = Math.min(
+        90,
+        nz + 2
+    );
+
+    draw();
+};
+
+
+/* =========================
+   DATE SIZE
+========================= */
+
+$("ds").onclick = () => {
+
+    dz = Math.max(
+        10,
+        dz - 2
+    );
+
+    draw();
+};
+
+$("db").onclick = () => {
+
+    dz = Math.min(
+        50,
+        dz + 2
+    );
+
+    draw();
+};
+
+
+/* =========================
+   RESET
+========================= */
+
+$("reset").onclick = () => {
+
+    nx = 728;
+    ny = 575;
+    nz = 46;
+
+    dx = 645;
+    dy = 915;
+    dz = 32;
+
+    draw();
+};
+
+
+/* =========================
+   PREVIOUS / NEXT
+========================= */
+
+$("prev").onclick = () => {
+
+    if (i > 0) {
+
+        i--;
+
+        upd();
+    }
+};
+
+
+$("next").onclick = () => {
+
+    if (i < rows.length - 1) {
+
+        i++;
+
+        upd();
+    }
+};
+
+
+/* =========================
+   SAFE FILE NAME
+========================= */
+
+function safe(v) {
+
+    return v
+        .replace(/[<>:"/\\|?*]/g, "")
+        .replace(/\s+/g, "_");
+}
+
+
+/* =========================
+   SAVE CERTIFICATE
+========================= */
+
+function save(v) {
+
+    let a =
+        document.createElement("a");
+
+    a.download =
+        safe(v) +
+        "_Certificate.png";
+
+    a.href =
+        c.toDataURL("image/png");
+
+    a.click();
+}
+
+
+/* =========================
+   DOWNLOAD SINGLE
+========================= */
+
+const downloadBtn =
+    document.getElementById(
+        "downloadBtn"
+    );
+
+downloadBtn.addEventListener(
+    "click",
+    function () {
+
+        draw();
+
+        const imageURL =
+            c.toDataURL(
+                "image/png",
+                1.0
+            );
+
+        const link =
+            document.createElement("a");
+
+        const fileName =
+            n
+                ? n.replace(/\s+/g, "_")
+                : "Certificate";
+
+        link.download =
+            fileName +
+            "_Certificate.png";
+
+        link.href = imageURL;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+    }
+);
+
+
+/* =========================
+   DOWNLOAD ALL
+========================= */
+
+$("all").onclick = async () => {
+
+    let old = i;
+
+    for (
+        let j = 0;
+        j < rows.length;
+        j++
+    ) {
+
+        i = j;
+
+        n = rows[j].name;
+
+        d =
+            rows[j].date ||
+            $("issueDate").value;
+
+        draw();
+
+        save(n);
+
+        await new Promise(
+            r => setTimeout(r, 400)
+        );
+    }
+
+    i = old;
+
+    upd();
+
+    $("status").textContent =
+        "Finished. Allow multiple downloads if Chrome asks.";
+};
+
+
+/* =========================
+   INITIAL DRAW
+========================= */
+
+draw();
+
+</script>
+
+</body>
+</html>
+```
